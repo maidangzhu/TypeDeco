@@ -1,16 +1,13 @@
-import { log } from "../src/typeDeco";
-import * as walkSync from "walk-sync";
+import ServerFactory from "../src/factory/serverFactory.class";
+import { app, log, autoware } from "../src/typeDeco";
 
-const srcDir = process.cwd() + "/src";
-const srcPaths = walkSync(srcDir, { globs: ['**/*.ts'] });
-for(let p of srcPaths) {
-    import(srcDir + "/" + p);
+@app
+class Main {
+	@autoware
+	public server: ServerFactory;
+
+	public main() {
+		this.server.start(8080);
+		log('start application');
+	}
 }
-
-const testDir = process.cwd() + "/test";
-const testPaths = walkSync(testDir, { globs: ['**/*.ts'] });
-for(let p of testPaths) {
-    import(testDir + "/" + p);
-}
-
-log("Main file running...");

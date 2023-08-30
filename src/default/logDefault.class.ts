@@ -1,8 +1,7 @@
-import { bean } from "../src/typeDeco";
-import LogFactory from "./logFactory.class";
+import { bean } from "../typeDeco";
+import LogFactory from "../factory/logFactory.class";
 
 export default class LogDefault extends LogFactory {
-
 	@bean
 	createLog(): LogFactory {
 		return new LogDefault();
