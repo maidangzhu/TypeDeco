@@ -1,4 +1,5 @@
 import * as express from "express";
+import BeanFactory from "./beanFactory.class";
 
 const routerMapper = {
 	"get": {},
@@ -19,9 +20,15 @@ function setRouter(app: express.Application) {
 }
 
 function GetMapping(value: string) {
-	console.log("=>(routeMapping.decorator.ts:23) value", value);
 	return function (target, propertyKey: string) {
-		routerMapper["get"][value] = target[propertyKey];
+		routerMapper["get"][value] = () => {
+			let getBean = BeanFactory.getBean(target.constructor);
+			if(getBean === undefined) {
+				BeanFactory.putBean(target.constructor, target);
+				getBean = target;
+			}
+			return getBean[propertyKey];
+		}
 	};
 }
 

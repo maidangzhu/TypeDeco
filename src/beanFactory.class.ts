@@ -1,3 +1,7 @@
+/**
+ * 是一个简单的工厂实现，用来管理（如存储和重用）应用程序中的对象实例。
+ * 这种模式在 Java Spring 框架中很常见，对其中的对象或者所谓的 "Beans" 进行管理。
+ */
 export default class BeanFactory {
 	private static beanMapper: Map<string, any> = new Map<string, any>();
 	private static beanFunctionMapper: Map<string, any> = new Map<string, any>();
