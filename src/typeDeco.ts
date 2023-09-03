@@ -38,11 +38,11 @@ function app<T extends { new(...args: any[]): {} }>(constructor: T) {
 
 /**
  * 这个装饰器将被装饰的类方式 BeanFactory 中
- * @param constructor
+ * @param constructorFunction
  */
-function onClass<T extends { new(...args: any[]): {} }>(constructor: T) {
-	log("decorator onClass: " + constructor.name);
-	BeanFactory.putBean(constructor, new constructor());
+function onClass(constructorFunction) {
+	log("decorator onClass: " + constructorFunction.name);
+	BeanFactory.putBean(constructorFunction, new constructorFunction());
 }
 
 /**
@@ -108,20 +108,37 @@ function log(message?: any, ...optionalParams: any[]) {
  */
 function before(constructorFunction, methodName: string) {
 	const targetBean = BeanFactory.getBean(constructorFunction);
-
-	return function (
-		target,
-		propertyKey: string
-	) {
+	return function (target, propertyKey: string) {
 		const currentMethod = targetBean[methodName];
-		targetBean[methodName] = (...args) => {
-			target[propertyKey]();
-			log("eeeeeeee")
-			return currentMethod(...args);
-		}
-		BeanFactory.putBean(constructorFunction, targetBean);
+		Object.assign(targetBean, {
+			[methodName]: function (...args) {
+				target[propertyKey](...args);
+				log("========== before ==========");
+				return currentMethod.apply(targetBean, args);
+			}
+		})
 	};
 }
 
 
-export { onClass, bean, autoware, inject, log, app, before };
+/**
+ * 这个装饰器接受类和类的方法名作为参数，其目的是使得每次原方法被调用后都会先执行一个固定的方法。
+ * 它把修改后的方法放回 BeanFactory。
+ * @param constructorFunction
+ */
+function after(constructorFunction, methodName: string) {
+	const targetBean = BeanFactory.getBean(constructorFunction);
+	return function (target, propertyKey: string) {
+		const currentMethod = targetBean[methodName];
+		Object.assign(targetBean, {
+			[methodName]: function (...args) {
+				const result = currentMethod.apply(targetBean, args);
+				const afterResult = target[propertyKey](result);
+				log("========== after ==========");
+				return afterResult ?? result;
+			}
+		})
+	};
+}
+
+export { onClass, bean, autoware, inject, log, app, before, after };
