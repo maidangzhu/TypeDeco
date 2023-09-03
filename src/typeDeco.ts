@@ -37,18 +37,12 @@ function app<T extends { new(...args: any[]): {} }>(constructor: T) {
 }
 
 /**
- * 这个装饰器返回一个新的类，扩展自被装饰的类，所有的实例都将看到被装饰类的所有属性和方法。
- * 它也记录了被装饰类的名字，但并没有做其他的事情。
+ * 这个装饰器将被装饰的类方式 BeanFactory 中
  * @param constructor
  */
 function onClass<T extends { new(...args: any[]): {} }>(constructor: T) {
 	log("decorator onClass: " + constructor.name);
-	return class extends constructor {
-		constructor(...args: any[]) {
-			super(...args);
-			//console.log("this.name");
-		}
-	};
+	BeanFactory.putBean(constructor, new constructor());
 }
 
 /**

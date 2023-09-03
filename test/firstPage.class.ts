@@ -1,6 +1,7 @@
-import { log } from "../src/typeDeco";
+import { log, onClass } from "../src/typeDeco";
 import { GetMapping } from "../src/routeMapping.decorator";
 
+@onClass
 export default class FirstPage {
 
 	@GetMapping("/first")
